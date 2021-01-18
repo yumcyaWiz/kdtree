@@ -41,19 +41,23 @@ using Point3i = Point<int, 3>;
 using Point3f = Point<float, 3>;
 using Point3d = Point<double, 3>;
 
+template <typename T>
+struct Node {
+  int axis;  // needed to visualize tree
+  T median;
+  T leftBottom;   // needed to visualize tree
+  T rightBottom;  // needed to visualize
+  T leftUp;       // needed to visualize tree
+  T rightUp;      // needed to visualize tree
+  Node* leftChild;
+  Node* rightChild;
+};
+
 template <typename T, unsigned int N>
 class KdTree {
  private:
   std::vector<Point<T, N>> points;
-
-  struct Node {
-    int axis;  // needed to visualize tree
-    Point<T, N> median;
-    Node* leftChild;
-    Node* rightChild;
-  };
-
-  Node* root;
+  Node<T>* root;
 
   // build kd-tree recursively
   // idx_start: start index of points
@@ -61,7 +65,7 @@ class KdTree {
   // NOTE: we can not pass points directly because we need to handle partial
   // elements of points
   // depth : current tree depth
-  Node* buildNode(int idx_start, int idx_end, int depth) {
+  Node<T>* buildNode(int idx_start, int idx_end, int depth) {
     // if points is empty
     if (idx_start <= idx_end) return nullptr;
 
@@ -78,16 +82,16 @@ class KdTree {
     const int idx_median = (idx_end - idx_start) / 2;
 
     // create node recursively
-    Node* node = new Node;
+    Node<T>* node = new Node<T>;
     node->axis = axis;
-    node->median = points[idx_median];
+    node->median = points[idx_median][axis];
     node->leftChild = buildNode(idx_start, idx_median, depth + 1);
     node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
 
     return node;
   }
 
-  void destructNode(Node* node) {
+  void destructNode(Node<T>* node) {
     if (!node) return;
 
     // delete left child
