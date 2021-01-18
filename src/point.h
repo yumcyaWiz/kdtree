@@ -1,6 +1,7 @@
 #ifndef _POINT_H
 #define _POINT_H
 #include <array>
+#include <cmath>
 #include <initializer_list>
 
 namespace kdtree {
@@ -27,6 +28,37 @@ class Point {
 
   T operator[](unsigned int i) const { return elements.at(i); }
 };
+
+template <typename T, unsigned int N>
+inline Point<T, N> operator+(const Point<T, N>& p1, const Point<T, N>& p2) {
+  Point<T, N> ret;
+  for (int i = 0; i < N; ++i) {
+    ret[i] = p1[i] + p2[i];
+  }
+  return ret;
+}
+template <typename T, unsigned int N>
+inline Point<T, N> operator-(const Point<T, N>& p1, const Point<T, N>& p2) {
+  Point<T, N> ret;
+  for (int i = 0; i < N; ++i) {
+    ret[i] = p1[i] - p2[i];
+  }
+  return ret;
+}
+
+template <typename T, unsigned int N>
+inline float norm(const Point<T, N>& p) {
+  T sum = 0;
+  for (int i = 0; i < N; ++i) {
+    sum += p[i] * p[i];
+  }
+  return std::sqrt(sum);
+}
+
+template <typename T, unsigned int N>
+inline float distance(const Point<T, N>& p1, const Point<T, N>& p2) {
+  return norm(p1 - p2);
+}
 
 using Point2u = Point<unsigned int, 2>;
 using Point2i = Point<int, 2>;
