@@ -4,6 +4,7 @@
 #include <array>
 #include <initializer_list>
 #include <iostream>
+#include <vector>
 
 namespace kdtree {
 
@@ -28,6 +29,58 @@ class Point {
   }
 
   T operator[](unsigned int i) const { return elements.at(i); }
+};
+
+template <typename T, unsigned int N>
+class KdTree {
+ private:
+  std::vector<Point<T, N>> points;
+
+  struct Node {
+    Point<T, N> median;
+    Node* leftChild;
+    Node* rightChild;
+  };
+
+  Node* root;
+
+  // build kd-tree recursively
+  // idx_start: start index of points
+  // idx_end: end index of points
+  // NOTE: we can not pass points directly because we need to handle partial
+  // elements of points
+  // depth : current tree depth
+  Node* buildNode(int idx_start, int idx_end, int depth) {
+    // if points is empty
+    if (idx_start - idx_end == 0) return nullptr;
+
+    // separation axis
+    int axis = depth % N;
+
+    // sort points
+    std::sort(points.begin() + idx_start, points.begin() + idx_end,
+              [&](const Point<T, N>& p1, const Point<T, N>& p2) {
+                return p1[axis] < p2[axis];
+              });
+
+    // choose median
+    const int idx_median = (idx_end - idx_start) / 2;
+
+    // create node recursively
+    Node* node = new Node;
+    node->median = points[idx_median];
+    node->leftChild = buildNode(idx_start, idx_median, depth + 1);
+    node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
+
+    return node;
+  }
+
+ public:
+  KdTree() {}
+  KdTree(std::initializer_list<Point<T, N>> init) : points(init) {}
+
+  // build kd-tree
+  void buildTree() { root = buildNode(0, points.size(), 0); }
 };
 
 }  // namespace kdtree
