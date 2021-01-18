@@ -86,18 +86,25 @@ class KdTree {
   }
 
   void destructNode(Node* node) {
+    if (!node) return;
+
+    // delete left child
     if (node->leftChild) {
       destructNode(node->leftChild);
     }
+    // delete right child
     if (node->rightChild) {
       destructNode(node->rightChild);
     }
+
+    // delete current node
     delete node;
   }
 
  public:
   KdTree() {}
   KdTree(std::initializer_list<Point<T, N>> init) : points(init) {}
+  KdTree(const std::vector<Point<T, N>>& points) : points(points) {}
 
   ~KdTree() { destructNode(root); }
 
