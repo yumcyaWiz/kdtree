@@ -47,6 +47,7 @@ class KdTree {
   std::vector<Point<T, N>> points;
 
   struct Node {
+    int axis;  // needed to visualize tree
     Point<T, N> median;
     Node* leftChild;
     Node* rightChild;
@@ -78,6 +79,7 @@ class KdTree {
 
     // create node recursively
     Node* node = new Node;
+    node->axis = axis;
     node->median = points[idx_median];
     node->leftChild = buildNode(idx_start, idx_median, depth + 1);
     node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
