@@ -30,7 +30,7 @@ class KdTree {
   // depth : current tree depth
   Node<T>* buildNode(int idx_start, int idx_end, int depth) {
     // if points is empty
-    if (idx_start <= idx_end) return nullptr;
+    if (idx_start > idx_end) return nullptr;
 
     // separation axis
     int axis = depth % N;
@@ -42,13 +42,13 @@ class KdTree {
               });
 
     // choose median
-    const int idx_median = (idx_end - idx_start) / 2;
+    const int idx_median = (idx_end - idx_start) / 2 + idx_start;
 
     // create node recursively
     Node<T>* node = new Node<T>;
     node->axis = axis;
     node->median = points[idx_median][axis];
-    node->leftChild = buildNode(idx_start, idx_median, depth + 1);
+    node->leftChild = buildNode(idx_start, idx_median - 1, depth + 1);
     node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
 
     return node;
@@ -78,7 +78,10 @@ class KdTree {
   ~KdTree() { destructNode(root); }
 
   // build kd-tree
-  void buildTree() { root = buildNode(0, points.size(), 0); }
+  void buildTree() { root = buildNode(0, points.size() - 1, 0); }
+
+  // nearest neighbor search
+  Point<T, N> searchNearest(const Point<T, N>& p) {}
 };
 
 }  // namespace kdtree
