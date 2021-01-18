@@ -10,6 +10,7 @@ namespace kdtree {
 
 template <typename T>
 struct Node {
+  int axis;
   T median;
   Node* leftChild;
   Node* rightChild;
@@ -45,6 +46,7 @@ class KdTree {
 
     // create node recursively
     Node<T>* node = new Node<T>;
+    node->axis = axis;
     node->median = points[idx_median][axis];
     node->leftChild = buildNode(idx_start, idx_median, depth + 1);
     node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
