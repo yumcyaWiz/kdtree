@@ -31,6 +31,16 @@ class Point {
   T operator[](unsigned int i) const { return elements.at(i); }
 };
 
+using Point2u = Point<unsigned int, 2>;
+using Point2i = Point<int, 2>;
+using Point2f = Point<float, 2>;
+using Point2d = Point<double, 2>;
+
+using Point3u = Point<unsigned int, 3>;
+using Point3i = Point<int, 3>;
+using Point3f = Point<float, 3>;
+using Point3d = Point<double, 3>;
+
 template <typename T, unsigned int N>
 class KdTree {
  private:
