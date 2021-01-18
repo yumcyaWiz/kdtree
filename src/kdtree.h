@@ -75,9 +75,21 @@ class KdTree {
     return node;
   }
 
+  void destructNode(Node* node) {
+    if (node->leftChild) {
+      destructNode(node->leftChild);
+    }
+    if (node->rightChild) {
+      destructNode(node->rightChild);
+    }
+    delete node;
+  }
+
  public:
   KdTree() {}
   KdTree(std::initializer_list<Point<T, N>> init) : points(init) {}
+
+  ~KdTree() { destructNode(root); }
 
   // build kd-tree
   void buildTree() { root = buildNode(0, points.size(), 0); }
