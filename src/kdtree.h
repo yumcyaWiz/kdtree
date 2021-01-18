@@ -62,7 +62,7 @@ class KdTree {
   // depth : current tree depth
   Node* buildNode(int idx_start, int idx_end, int depth) {
     // if points is empty
-    if (idx_start - idx_end == 0) return nullptr;
+    if (idx_start <= idx_end) return nullptr;
 
     // separation axis
     int axis = depth % N;
