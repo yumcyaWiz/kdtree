@@ -43,12 +43,7 @@ using Point3d = Point<double, 3>;
 
 template <typename T>
 struct Node {
-  int axis;  // needed to visualize tree
   T median;
-  T leftBottom;   // needed to visualize tree
-  T rightBottom;  // needed to visualize
-  T leftUp;       // needed to visualize tree
-  T rightUp;      // needed to visualize tree
   Node* leftChild;
   Node* rightChild;
 };
@@ -83,7 +78,6 @@ class KdTree {
 
     // create node recursively
     Node<T>* node = new Node<T>;
-    node->axis = axis;
     node->median = points[idx_median][axis];
     node->leftChild = buildNode(idx_start, idx_median, depth + 1);
     node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);

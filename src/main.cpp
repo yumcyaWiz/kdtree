@@ -4,6 +4,11 @@
 
 #include "kdtree.h"
 
+const int width = 512;
+const int height = 512;
+const int n_balls = 10;
+
+// uniform random number in [0, 1]
 float rnd() {
   static std::mt19937 mt(0);
   static std::uniform_real_distribution<float> dist(0, 1);
@@ -11,10 +16,6 @@ float rnd() {
 }
 
 int main() {
-  const int width = 512;
-  const int height = 512;
-  const int n_balls = 10;
-
   sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
 
   std::vector<kdtree::Point2f> points;
@@ -42,9 +43,14 @@ int main() {
     }
 
     window.clear(sf::Color::White);
+
+    // draw balls
     for (const auto& c : circles) {
       window.draw(c);
     }
+
+    // draw kd-tree
+
     window.display();
   }
 
