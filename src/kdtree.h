@@ -8,53 +8,58 @@
 
 namespace kdtree {
 
-template <typename T>
 struct Node {
-  int axis;
-  T median;
-  Node* leftChild;
-  Node* rightChild;
+  int axis;          // separation axis
+  int idx_median;    // index of median point
+  Node* leftChild;   // left child node
+  Node* rightChild;  // right child node
 };
 
-template <typename T, unsigned int N>
+// PointT: point type
+// PointT must have following property
+// unsigned int PointT::dim             dimmension
+// T PointT::operator[](unsigned int)   element access
+// TODO: use concept in C++20
+template <typename PointT>
 class KdTree {
  private:
-  std::vector<Point<T, N>> points;
-  Node<T>* root;
+  std::vector<PointT> points;  // array of points
+  Node* root;                  // root node
 
   // build kd-tree recursively
+  // indices: indices of points
   // idx_start: start index of points
   // idx_end: end index of points
-  // NOTE: we can not pass points directly because we need to handle partial
-  // elements of points
   // depth : current tree depth
-  Node<T>* buildNode(int idx_start, int idx_end, int depth) {
+  // NOTE: using indices rather than points directly helps to reduce memory
+  // allocation and copy operations
+  Node* buildNode(int* indices, int idx_start, int idx_end, int depth) {
     // if points is empty
     if (idx_start > idx_end) return nullptr;
 
     // separation axis
-    int axis = depth % N;
+    int axis = depth % PointT::dim;
 
-    // sort points
+    // sort indices
     std::sort(points.begin() + idx_start, points.begin() + idx_end,
-              [&](const Point<T, N>& p1, const Point<T, N>& p2) {
-                return p1[axis] < p2[axis];
+              [&](const int idx1, const int idx2) {
+                return points[idx1][axis] < points[idx2][axis];
               });
 
     // choose median
     const int idx_median = (idx_end - idx_start) / 2 + idx_start;
 
     // create node recursively
-    Node<T>* node = new Node<T>;
+    Node* node = new Node;
     node->axis = axis;
-    node->median = points[idx_median][axis];
-    node->leftChild = buildNode(idx_start, idx_median - 1, depth + 1);
-    node->rightChild = buildNode(idx_median + 1, idx_end, depth + 1);
+    node->idx_median = idx_median;
+    node->leftChild = buildNode(indices, idx_start, idx_median - 1, depth + 1);
+    node->rightChild = buildNode(indices, idx_median + 1, idx_end, depth + 1);
 
     return node;
   }
 
-  void destructNode(Node<T>* node) {
+  void destructNode(Node* node) {
     if (!node) return;
 
     // delete left child
@@ -71,17 +76,21 @@ class KdTree {
   }
 
  public:
-  KdTree() {}
-  KdTree(std::initializer_list<Point<T, N>> init) : points(init) {}
-  KdTree(const std::vector<Point<T, N>>& points) : points(points) {}
+  KdTree() : root(nullptr) {}
+  KdTree(std::initializer_list<PointT> init) : root(nullptr), points(init) {}
+  KdTree(const std::vector<PointT>& points) : root(nullptr), points(points) {}
 
   ~KdTree() { destructNode(root); }
 
   // build kd-tree
-  void buildTree() { root = buildNode(0, points.size() - 1, 0); }
+  void buildTree() {
+    // setup indices of points
+    std::vector<int> indices(points.size());
+    std::iota(indices.begin(), indices.end(), 0);
 
-  // nearest neighbor search
-  Point<T, N> searchNearest(const Point<T, N>& p) {}
+    // build tree recursively
+    root = buildNode(indices.data(), 0, points.size() - 1, 0);
+  }
 };
 
 }  // namespace kdtree
