@@ -1,10 +1,9 @@
 #ifndef _KDTREE_H
 #define _KDTREE_H
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <vector>
-
-#include "point.h"
 
 namespace kdtree {
 
@@ -59,6 +58,7 @@ class KdTree {
     return node;
   }
 
+  // delete node recursively
   void destructNode(Node* node) {
     if (!node) return;
 
@@ -73,6 +73,23 @@ class KdTree {
 
     // delete current node
     delete node;
+  }
+
+  // compute distance between given points
+  static float distance(const PointT& p1, const PointT& p2) {
+    float dist2 = 0;
+    for (int i = 0; i < PointT::dim; ++i) {
+      dist2 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
+    }
+    return std::sqrt(dist2);
+  }
+
+  void searchNearestNode(Node* node, const PointT& p, float r) {
+    // if node is empty, exit
+    if (!node) return;
+
+    // distance from query point to partition point
+    const float dist = distance(p, points[node->idx_median]);
   }
 
  public:
@@ -91,6 +108,11 @@ class KdTree {
     // build tree recursively
     root = buildNode(indices.data(), 0, points.size() - 1, 0);
   }
+
+  // nearest neighbor search
+  // p: query point
+  // return: index of nearest point
+  unsigned int searchNearest(const PointT& p) { return 0; }
 };
 
 }  // namespace kdtree
