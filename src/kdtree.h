@@ -84,12 +84,43 @@ class KdTree {
     return std::sqrt(dist2);
   }
 
-  void searchNearestNode(Node* node, const PointT& p, float r) {
+  void searchNearestNode(Node* node, const PointT& queryPoint, int& idx_nearest,
+                         float& minDist) {
     // if node is empty, exit
     if (!node) return;
 
+    // median point
+    const PointT& median = points[node->idx_median];
+
     // distance from query point to partition point
-    const float dist = distance(p, points[node->idx_median]);
+    const float dist = distance(queryPoint, median);
+
+    // update minimum distance and index of nearest point
+    if (dist < minDist) {
+      idx_nearest = node->idx_median;
+      minDist = dist;
+    }
+
+    // if query point is lower than median, search left child
+    // else, search right child
+    const bool isLower = queryPoint[node->axis] < median[node->axis];
+    if (isLower) {
+      searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist);
+    } else {
+      searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist);
+    }
+
+    // at leaf node, test minDist overlaps siblings region
+    // if so, search siblings
+    const float dist_to_siblings =
+        std::abs(median[node->axis] - queryPoint[node->axis]);
+    if (dist_to_siblings < minDist) {
+      if (isLower) {
+        searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist);
+      } else {
+        searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist);
+      }
+    }
   }
 
  public:
@@ -110,9 +141,12 @@ class KdTree {
   }
 
   // nearest neighbor search
-  // p: query point
-  // return: index of nearest point
-  unsigned int searchNearest(const PointT& p) { return 0; }
+  // return index of nearest neighbor point
+  int searchNearest(const PointT& queryPoint, float& minDist) {
+    int idx_nearest;
+    searchNearestNode(root, queryPoint, idx_nearest, minDist);
+    return idx_nearest;
+  }
 };
 
 }  // namespace kdtree
