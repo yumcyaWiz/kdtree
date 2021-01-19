@@ -17,8 +17,8 @@ struct Node {
 
 // PointT: point type
 // PointT must have following property
-// unsigned int PointT::dim             dimmension
-// T PointT::operator[](unsigned int)   element access
+// unsigned int PointT::dim                   dimmension
+// T PointT::operator[](unsigned int) const   element access
 // TODO: use concept in C++20
 template <typename PointT>
 class KdTree {
@@ -41,7 +41,7 @@ class KdTree {
     int axis = depth % PointT::dim;
 
     // sort indices
-    std::sort(points.begin() + idx_start, points.begin() + idx_end,
+    std::sort(indices + idx_start, indices + idx_end,
               [&](const int idx1, const int idx2) {
                 return points[idx1][axis] < points[idx2][axis];
               });
