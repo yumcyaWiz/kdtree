@@ -15,15 +15,34 @@ float rnd() {
   return dist(mt);
 }
 
+// override sf::Vector2f to satisfy PointT requirements
+class Point2f : public sf::Vector2f {
+ public:
+  static constexpr unsigned int dim = 2;
+
+  Point2f(float x, float y) : sf::Vector2f(x, y) {}
+
+  float operator[](unsigned int i) const {
+    if (i == 0) {
+      return x;
+    } else if (i == 1) {
+      return y;
+    } else {
+      std::cerr << "invalid dimension" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  }
+};
+
 int main() {
   sf::RenderWindow window(sf::VideoMode(width, height), "SFML works!");
 
-  std::vector<kdtree::Point2f> points;
+  std::vector<Point2f> points;
   for (int i = 0; i < n_balls; ++i) {
-    points.push_back(kdtree::Point2f{width * rnd(), height * rnd()});
+    points.push_back(Point2f{width * rnd(), height * rnd()});
   }
 
-  kdtree::KdTree<float, 2> tree(points);
+  kdtree::KdTree<Point2f> tree(points);
   tree.buildTree();
 
   std::vector<sf::CircleShape> circles;
@@ -31,8 +50,7 @@ int main() {
     sf::CircleShape circle;
     circle.setFillColor(sf::Color::Black);
     circle.setRadius(10.0f);
-    circle.setPosition(sf::Vector2f(points[i][0], points[i][1]));
-
+    circle.setPosition(points[i]);
     circles.push_back(circle);
   }
 
