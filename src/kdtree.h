@@ -28,33 +28,32 @@ class KdTree {
 
   // build kd-tree recursively
   // indices: indices of points
-  // idx_start: start index of points
-  // idx_end: end index of points
+  // n_points: number of points
   // depth : current tree depth
   // NOTE: using indices rather than points directly helps to reduce memory
   // allocation and copy operations
-  Node* buildNode(int* indices, int idx_start, int idx_end, int depth) {
+  Node* buildNode(int* indices, int n_points, int depth) {
     // if points is empty
-    if (idx_start > idx_end) return nullptr;
+    if (n_points <= 0) return nullptr;
 
     // separation axis
-    int axis = depth % PointT::dim;
+    const int axis = depth % PointT::dim;
 
-    // sort indices
-    std::sort(indices + idx_start, indices + idx_end,
-              [&](const int idx1, const int idx2) {
-                return points[idx1][axis] < points[idx2][axis];
-              });
+    // sort indices by point coordinate in separation axis
+    std::sort(indices, indices + n_points, [&](const int idx1, const int idx2) {
+      return points[idx1][axis] < points[idx2][axis];
+    });
 
-    // choose median
-    const int idx_median = (idx_end - idx_start) / 2 + idx_start;
+    // index of middle element of indices
+    const int mid = (n_points - 1) / 2;
 
     // create node recursively
     Node* node = new Node;
     node->axis = axis;
-    node->idx_median = idx_median;
-    node->leftChild = buildNode(indices, idx_start, idx_median - 1, depth + 1);
-    node->rightChild = buildNode(indices, idx_median + 1, idx_end, depth + 1);
+    node->idx_median = indices[mid];
+    node->leftChild = buildNode(indices, mid, depth + 1);
+    node->rightChild =
+        buildNode(indices + mid + 1, n_points - mid - 1, depth + 1);
 
     return node;
   }
@@ -76,6 +75,16 @@ class KdTree {
     delete node;
   }
 
+  void printTreeNode(Node* node) {
+    std::cout << node->idx_median << std::endl;
+    if (node->leftChild) {
+      printTreeNode(node->leftChild);
+    }
+    if (node->rightChild) {
+      printTreeNode(node->rightChild);
+    }
+  }
+
   // compute distance between given points
   static float distance(const PointT& p1, const PointT& p2) {
     float dist2 = 0;
@@ -87,7 +96,7 @@ class KdTree {
 
   // search nearest neighbor node recursively
   void searchNearestNode(Node* node, const PointT& queryPoint, int& idx_nearest,
-                         float& minDist) {
+                         float& minDist) const {
     // if node is empty, exit
     if (!node) return;
 
@@ -114,7 +123,7 @@ class KdTree {
     // if so, search siblings
     const float dist_to_siblings =
         std::abs(median[node->axis] - queryPoint[node->axis]);
-    if (dist_to_siblings < minDist) {
+    if (minDist > dist_to_siblings) {
       if (isLower) {
         searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist);
       } else {
@@ -137,12 +146,14 @@ class KdTree {
     std::iota(indices.begin(), indices.end(), 0);
 
     // build tree recursively
-    root = buildNode(indices.data(), 0, points.size() - 1, 0);
+    root = buildNode(indices.data(), points.size(), 0);
   }
+
+  void printTree() { printTreeNode(root); }
 
   // nearest neighbor search
   // return index of nearest neighbor point
-  int searchNearest(const PointT& queryPoint, float& minDist) {
+  int searchNearest(const PointT& queryPoint, float& minDist) const {
     int idx_nearest;
     float _minDist = std::numeric_limits<float>::max();
     searchNearestNode(root, queryPoint, idx_nearest, _minDist);
