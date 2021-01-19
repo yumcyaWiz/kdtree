@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 namespace kdtree {
@@ -84,6 +85,7 @@ class KdTree {
     return std::sqrt(dist2);
   }
 
+  // search nearest neighbor node recursively
   void searchNearestNode(Node* node, const PointT& queryPoint, int& idx_nearest,
                          float& minDist) {
     // if node is empty, exit
@@ -92,10 +94,8 @@ class KdTree {
     // median point
     const PointT& median = points[node->idx_median];
 
-    // distance from query point to partition point
-    const float dist = distance(queryPoint, median);
-
     // update minimum distance and index of nearest point
+    const float dist = distance(queryPoint, median);
     if (dist < minDist) {
       idx_nearest = node->idx_median;
       minDist = dist;
@@ -144,7 +144,9 @@ class KdTree {
   // return index of nearest neighbor point
   int searchNearest(const PointT& queryPoint, float& minDist) {
     int idx_nearest;
-    searchNearestNode(root, queryPoint, idx_nearest, minDist);
+    float _minDist = std::numeric_limits<float>::max();
+    searchNearestNode(root, queryPoint, idx_nearest, _minDist);
+    minDist = _minDist;
     return idx_nearest;
   }
 };
