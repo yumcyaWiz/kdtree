@@ -1,5 +1,5 @@
 #include "common.h"
-#include "kdtree.h"
+#include "kdtree/kdtree.h"
 
 int main() {
   const int width = 512;

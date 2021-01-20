@@ -9,7 +9,7 @@ following features are implemented.
 
 |filename|description|
 |:--|:--|
-|`src/kdtree.h`|implementation of kdtree|
+|`include/kdtree.h`|header-only implementation of kdtree|
 |`src/common.h`|common components of visualization programs|
 |`src/nn.cpp`|visualization of nearest neighbor search|
 |`src/knn.cpp`|visualization of k-nearest neighbor search|
