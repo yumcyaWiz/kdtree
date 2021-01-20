@@ -31,6 +31,39 @@ add_subdirectory(<path-to-kdtree>)
 target_link_libraries(<your-target> kdtree)
 ```
 
+## how to use kdtree in your source
+
+```cpp
+// include kdtree
+#include "kdtree/kdtree.h"
+
+// setup points 
+std::vector<Point> points;
+// populate points here...
+
+// setup kdtree
+kdtree::KdTree<Point> tree(points);
+// build kdtree
+tree.buildTree();
+
+// nearest neighbor search
+Point queryPoint = ...
+int index_of_nearest = tree.searchNearest(queryPoint);
+
+// k-nearest neighbor search
+int k = 5;
+std::vector<int> indices_of_k_nearest = tree.searchKNearest(queryPoint, k);
+
+// spherical range search
+float r = 1.5;
+std::vector<int> indices_of_range = tree.sphericalRangeSearch(queryPoint, r);
+```
+
+Note that `Point` must have following members.
+
+* `T Point::operator[](unsigned int) const`: element access
+* `static unsigned int Point::dim`: number of dimension
+
 ## how to build visualization programs
 
 set cmake option `KDTREE_VISUALIZATION` to `On`
