@@ -18,14 +18,25 @@ following features are implemented.
 
 * C++17
 * CMake 3.12 or Higher
-* [SFML 2.5](https://github.com/SFML/SFML)
+* [SFML 2.5](https://github.com/SFML/SFML) (if you want to build visualization programs)
 
-## Build
+## how to integrate kdtree into your cmake project
+
+in your CMakeLists.txt
+
+```cmake
+add_subdirectory(<path-to-kdtree>)
+target_link_libraries(<your-target> kdtree)
+```
+
+## how to build visualization programs
+
+set cmake option `KDTREE_VISUALIZATION` to `On`
 
 ```bash
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release -DKDTREE_VISUALIZATION=On ..
 make
 ```
 
