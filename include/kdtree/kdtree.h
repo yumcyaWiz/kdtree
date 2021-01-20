@@ -173,8 +173,8 @@ class KdTree {
   }
 
   // range search with radius r sphere.
-  void rangeSearchSphereNode(const Node* node, const PointT& queryPoint,
-                             float r, std::vector<int>& list) const {
+  void sphericalRangeSearchNode(const Node* node, const PointT& queryPoint,
+                                float r, std::vector<int>& list) const {
     if (!node) return;
 
     // median point
@@ -191,18 +191,18 @@ class KdTree {
     // else, search right child
     const bool isLower = queryPoint[node->axis] < median[node->axis];
     if (isLower) {
-      rangeSearchSphereNode(node->leftChild, queryPoint, r, list);
+      sphericalRangeSearchNode(node->leftChild, queryPoint, r, list);
     } else {
-      rangeSearchSphereNode(node->rightChild, queryPoint, r, list);
+      sphericalRangeSearchNode(node->rightChild, queryPoint, r, list);
     }
 
     // at leaf node, if sphere overlaps sibblings region, search sibbligs
     const float dist_to_siblings = median[node->axis] - queryPoint[node->axis];
     if (r > dist_to_siblings * dist_to_siblings) {
       if (isLower) {
-        rangeSearchSphereNode(node->rightChild, queryPoint, r, list);
+        sphericalRangeSearchNode(node->rightChild, queryPoint, r, list);
       } else {
-        rangeSearchSphereNode(node->leftChild, queryPoint, r, list);
+        sphericalRangeSearchNode(node->leftChild, queryPoint, r, list);
       }
     }
   }
@@ -252,9 +252,10 @@ class KdTree {
   }
 
   // range search with radius r sphere centered at query point
-  std::vector<int> rangeSearchSphere(const PointT& queryPoint, float r) const {
+  std::vector<int> sphericalRangeSearch(const PointT& queryPoint,
+                                        float r) const {
     std::vector<int> ret;
-    rangeSearchSphereNode(root, queryPoint, r, ret);
+    sphericalRangeSearchNode(root, queryPoint, r, ret);
     return ret;
   }
 };
