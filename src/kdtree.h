@@ -86,49 +86,48 @@ class KdTree {
     }
   }
 
-  // compute distance between given points
-  static float distance(const PointT& p1, const PointT& p2) {
+  // compute squared distance between given points
+  static float distance2(const PointT& p1, const PointT& p2) {
     float dist2 = 0;
     for (int i = 0; i < PointT::dim; ++i) {
       dist2 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
     }
-    return std::sqrt(dist2);
+    return dist2;
   }
 
   // search nearest neighbor node recursively
   void searchNearestNode(const Node* node, const PointT& queryPoint,
-                         int& idx_nearest, float& minDist) const {
+                         int& idx_nearest, float& minDist2) const {
     // if node is empty, exit
     if (!node) return;
 
     // median point
     const PointT& median = points[node->idx_median];
 
-    // update minimum distance and index of nearest point
-    const float dist = distance(queryPoint, median);
-    if (dist < minDist) {
+    // update minimum squared distance and index of nearest point
+    const float dist2 = distance2(queryPoint, median);
+    if (dist2 < minDist2) {
       idx_nearest = node->idx_median;
-      minDist = dist;
+      minDist2 = dist2;
     }
 
     // if query point is lower than median, search left child
     // else, search right child
     const bool isLower = queryPoint[node->axis] < median[node->axis];
     if (isLower) {
-      searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist);
+      searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist2);
     } else {
-      searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist);
+      searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist2);
     }
 
     // at leaf node, test minDist overlaps siblings region
     // if so, search siblings
-    const float dist_to_siblings =
-        std::abs(median[node->axis] - queryPoint[node->axis]);
-    if (minDist > dist_to_siblings) {
+    const float dist_to_siblings = median[node->axis] - queryPoint[node->axis];
+    if (minDist2 > dist_to_siblings * dist_to_siblings) {
       if (isLower) {
-        searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist);
+        searchNearestNode(node->rightChild, queryPoint, idx_nearest, minDist2);
       } else {
-        searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist);
+        searchNearestNode(node->leftChild, queryPoint, idx_nearest, minDist2);
       }
     }
   }
@@ -143,8 +142,8 @@ class KdTree {
     const PointT& median = points[node->idx_median];
 
     // push to queue
-    const float dist = distance(queryPoint, median);
-    queue.emplace(dist, node->idx_median);
+    const float dist2 = distance2(queryPoint, median);
+    queue.emplace(dist2, node->idx_median);
 
     // if size of queue is larger than k, pop queue
     if (queue.size() > k) {
@@ -162,9 +161,8 @@ class KdTree {
 
     // at leaf node, if size of queue is smaller than k, or queue's largest
     // minimum distance overlaps sibblings region, then search siblings
-    const float dist_to_siblings =
-        std::abs(median[node->axis] - queryPoint[node->axis]);
-    if (queue.top().first > dist_to_siblings) {
+    const float dist_to_siblings = median[node->axis] - queryPoint[node->axis];
+    if (queue.top().first > dist_to_siblings * dist_to_siblings) {
       if (isLower) {
         searchKNearestNode(node->rightChild, queryPoint, k, queue);
       } else {
