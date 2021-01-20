@@ -24,7 +24,7 @@ int main() {
   // setup sf circle object
   std::vector<Ball> balls;
   for (int i = 0; i < n_balls; ++i) {
-    Ball ball(10.0f);
+    Ball ball(5.0f);
     ball.setPosition(points[i]);
     balls.emplace_back(ball);
   }
