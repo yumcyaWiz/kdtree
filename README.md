@@ -5,7 +5,7 @@ header-only simple implementation of kdtree and visualization.
 |filename|description|
 |:--|:--|
 |`src/kdtree.h`|implementation of kdtree|
-|`src/nns.cpp`|visualization of nearest neighbor search|
+|`src/nn.cpp`|visualization of nearest neighbor search|
 
 
 ## Requirements
