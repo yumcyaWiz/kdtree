@@ -8,13 +8,6 @@
 
 namespace kdtree {
 
-struct Node {
-  int axis;          // separation axis
-  int idx_median;    // index of median point
-  Node* leftChild;   // left child node
-  Node* rightChild;  // right child node
-};
-
 // PointT: point type
 // PointT must have following property
 // unsigned int PointT::dim                   dimmension
@@ -23,6 +16,13 @@ struct Node {
 template <typename PointT>
 class KdTree {
  private:
+  struct Node {
+    int axis;          // separation axis
+    int idx_median;    // index of median point
+    Node* leftChild;   // left child node
+    Node* rightChild;  // right child node
+  };
+
   std::vector<PointT> points;  // array of points
   Node* root;                  // root node
 
@@ -149,6 +149,7 @@ class KdTree {
     root = buildNode(indices.data(), points.size(), 0);
   }
 
+  // print kd-tree on terminal
   void printTree() { printTreeNode(root); }
 
   // nearest neighbor search
