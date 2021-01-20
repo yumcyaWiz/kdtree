@@ -19,12 +19,11 @@ class KdTree {
  private:
   struct Node {
     int axis;          // separation axis
-    int idx_median;    // index of median point
+    int idx;           // index of median point
     Node* leftChild;   // left child node
     Node* rightChild;  // right child node
 
-    Node()
-        : axis(-1), idx_median(-1), leftChild(nullptr), rightChild(nullptr) {}
+    Node() : axis(-1), idx(-1), leftChild(nullptr), rightChild(nullptr) {}
   };
 
   std::vector<PointT> points;  // array of points
@@ -54,7 +53,7 @@ class KdTree {
     // create node recursively
     Node* node = new Node();
     node->axis = axis;
-    node->idx_median = indices[mid];
+    node->idx = indices[mid];
     node->leftChild = buildNode(indices, mid, depth + 1);
     node->rightChild =
         buildNode(indices + mid + 1, n_points - mid - 1, depth + 1);
@@ -80,7 +79,7 @@ class KdTree {
   }
 
   void printTreeNode(const Node* node) const {
-    std::cout << node->idx_median << std::endl;
+    std::cout << node->idx << std::endl;
     if (node->leftChild) {
       printTreeNode(node->leftChild);
     }
@@ -101,16 +100,15 @@ class KdTree {
   // search nearest neighbor node recursively
   void searchNearestNode(const Node* node, const PointT& queryPoint,
                          int& idx_nearest, float& minDist2) const {
-    // if node is empty, exit
     if (!node) return;
 
     // median point
-    const PointT& median = points[node->idx_median];
+    const PointT& median = points[node->idx];
 
     // update minimum squared distance and index of nearest point
     const float dist2 = distance2(queryPoint, median);
     if (dist2 < minDist2) {
-      idx_nearest = node->idx_median;
+      idx_nearest = node->idx;
       minDist2 = dist2;
     }
 
@@ -142,11 +140,11 @@ class KdTree {
     if (!node) return;
 
     // median point
-    const PointT& median = points[node->idx_median];
+    const PointT& median = points[node->idx];
 
     // push to queue
     const float dist2 = distance2(queryPoint, median);
-    queue.emplace(dist2, node->idx_median);
+    queue.emplace(dist2, node->idx);
 
     // if size of queue is larger than k, pop queue
     if (queue.size() > k) {
