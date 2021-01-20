@@ -11,10 +11,10 @@ following features are implemented.
 |filename|description|
 |:--|:--|
 |`include/kdtree.h`|header-only implementation of kdtree|
-|`src/common.h`|common components of visualization programs|
-|`src/nn.cpp`|visualization of nearest neighbor search|
-|`src/knn.cpp`|visualization of k-nearest neighbor search|
-|`src/sr.cpp`|visualization of spherical range search|
+|`examples/common.h`|common components of visualization programs|
+|`examples/nn.cpp`|visualization of nearest neighbor search|
+|`examples/knn.cpp`|visualization of k-nearest neighbor search|
+|`examples/sr.cpp`|visualization of spherical range search|
 
 ## Requirements
 

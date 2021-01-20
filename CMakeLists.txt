@@ -14,26 +14,26 @@ if(KDTREE_VISUALIZATION)
   find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
   # nn
-  add_executable(nn src/nn.cpp)
+  add_executable(nn examples/nn.cpp)
   target_compile_features(nn PUBLIC cxx_std_17)
   set_target_properties(nn PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(nn PRIVATE src)
+  target_include_directories(nn PRIVATE examples)
   target_link_libraries(nn kdtree)
   target_link_libraries(nn sfml-graphics sfml-window sfml-system)
 
   # knn
-  add_executable(knn src/knn.cpp)
+  add_executable(knn examples/knn.cpp)
   target_compile_features(knn PUBLIC cxx_std_17)
   set_target_properties(knn PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(knn PRIVATE src)
+  target_include_directories(knn PRIVATE examples)
   target_link_libraries(knn kdtree)
   target_link_libraries(knn sfml-graphics sfml-window sfml-system)
 
   # rs
-  add_executable(sr src/sr.cpp)
+  add_executable(sr examples/sr.cpp)
   target_compile_features(sr PUBLIC cxx_std_17)
   set_target_properties(sr PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(sr PRIVATE src)
+  target_include_directories(sr PRIVATE examples)
   target_link_libraries(sr kdtree)
   target_link_libraries(sr sfml-graphics sfml-window sfml-system)
 endif()
