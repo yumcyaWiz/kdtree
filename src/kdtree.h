@@ -22,6 +22,9 @@ class KdTree {
     int idx_median;    // index of median point
     Node* leftChild;   // left child node
     Node* rightChild;  // right child node
+
+    Node()
+        : axis(-1), idx_median(-1), leftChild(nullptr), rightChild(nullptr) {}
   };
 
   std::vector<PointT> points;  // array of points
@@ -49,7 +52,7 @@ class KdTree {
     const int mid = (n_points - 1) / 2;
 
     // create node recursively
-    Node* node = new Node;
+    Node* node = new Node();
     node->axis = axis;
     node->idx_median = indices[mid];
     node->leftChild = buildNode(indices, mid, depth + 1);
