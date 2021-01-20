@@ -6,6 +6,7 @@ following features are implemented.
 
 * Nearest neighbor search
 * k-Nearest neighbor search
+* Spherical range search
 
 |filename|description|
 |:--|:--|
@@ -13,6 +14,7 @@ following features are implemented.
 |`src/common.h`|common components of visualization programs|
 |`src/nn.cpp`|visualization of nearest neighbor search|
 |`src/knn.cpp`|visualization of k-nearest neighbor search|
+|`src/sr.cpp`|visualization of spherical range search|
 
 ## Requirements
 

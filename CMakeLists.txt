@@ -28,4 +28,12 @@ if(KDTREE_VISUALIZATION)
   target_include_directories(knn PRIVATE src)
   target_link_libraries(knn kdtree)
   target_link_libraries(knn sfml-graphics sfml-window sfml-system)
+
+  # rs
+  add_executable(sr src/sr.cpp)
+  target_compile_features(sr PUBLIC cxx_std_17)
+  set_target_properties(sr PROPERTIES CXX_EXTENSIONS OFF)
+  target_include_directories(sr PRIVATE src)
+  target_link_libraries(sr kdtree)
+  target_link_libraries(sr sfml-graphics sfml-window sfml-system)
 endif()
