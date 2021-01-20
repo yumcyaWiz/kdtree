@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <queue>
 #include <vector>
 
 namespace kdtree {
@@ -132,6 +133,46 @@ class KdTree {
     }
   }
 
+  // search k-nearest neighbor nodes recursively
+  using KNNQueue = std::priority_queue<std::pair<float, int>>;
+  void searchKNearestNode(const Node* node, const PointT& queryPoint, int k,
+                          KNNQueue& queue) const {
+    if (!node) return;
+
+    // median point
+    const PointT& median = points[node->idx_median];
+
+    // push to queue
+    const float dist = distance(queryPoint, median);
+    queue.emplace(dist, node->idx_median);
+
+    // if size of queue is larger than k, pop queue
+    if (queue.size() > k) {
+      queue.pop();
+    }
+
+    // if query point is lower than median, search left child
+    // else, search right child
+    const bool isLower = queryPoint[node->axis] < median[node->axis];
+    if (isLower) {
+      searchKNearestNode(node->leftChild, queryPoint, k, queue);
+    } else {
+      searchKNearestNode(node->rightChild, queryPoint, k, queue);
+    }
+
+    // at leaf node, if size of queue is smaller than k, or queue's largest
+    // minimum distance overlaps sibblings region, then search siblings
+    const float dist_to_siblings =
+        std::abs(median[node->axis] - queryPoint[node->axis]);
+    if (queue.top().first > dist_to_siblings) {
+      if (isLower) {
+        searchKNearestNode(node->rightChild, queryPoint, k, queue);
+      } else {
+        searchKNearestNode(node->leftChild, queryPoint, k, queue);
+      }
+    }
+  }
+
  public:
   KdTree() : root(nullptr) {}
   KdTree(std::initializer_list<PointT> init) : root(nullptr), points(init) {}
@@ -160,6 +201,19 @@ class KdTree {
     searchNearestNode(root, queryPoint, idx_nearest, _minDist);
     minDist = _minDist;
     return idx_nearest;
+  }
+
+  // k-nearest neighbor search
+  // return indices of k-nearest neighbor points
+  std::vector<int> searchKNearest(const PointT& queryPoint, int k) const {
+    KNNQueue queue;
+    searchKNearestNode(root, queryPoint, k, queue);
+
+    std::vector<int> ret(queue.size());
+    for (int i = 0; i < ret.size(); ++i) {
+      ret[i] = queue.c[i].first;
+    }
+    return ret;
   }
 };
 
