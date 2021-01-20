@@ -183,7 +183,7 @@ class KdTree {
     // if distance from query point to median point is smaller than radius, add
     // median point to list
     const float dist2 = distance2(queryPoint, median);
-    if (dist2 < r) {
+    if (dist2 < r * r) {
       list.push_back(node->idx);
     }
 
@@ -198,7 +198,7 @@ class KdTree {
 
     // at leaf node, if sphere overlaps sibblings region, search sibbligs
     const float dist_to_siblings = median[node->axis] - queryPoint[node->axis];
-    if (r > dist_to_siblings * dist_to_siblings) {
+    if (r * r > dist_to_siblings * dist_to_siblings) {
       if (isLower) {
         sphericalRangeSearchNode(node->rightChild, queryPoint, r, list);
       } else {
