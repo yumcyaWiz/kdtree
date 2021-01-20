@@ -12,17 +12,19 @@ following features are implemented.
 |:--|:--|
 |`include/kdtree.h`|header-only implementation of kdtree|
 |`examples/common.h`|common components of visualization programs|
-|`examples/nn.cpp`|visualization of nearest neighbor search|
-|`examples/knn.cpp`|visualization of k-nearest neighbor search|
-|`examples/sr.cpp`|visualization of spherical range search|
+|`examples/search.cpp`|visualization of neighbor search result|
 
 ## Requirements
 
 * C++17
 * CMake 3.12 or Higher
-* [SFML 2.5](https://github.com/SFML/SFML) (if you want to build visualization programs)
 
-## how to integrate kdtree into your cmake project
+if you want to build visualization programs, you also need followings.
+
+* OpenGL 3.1
+* [SFML 2.5](https://github.com/SFML/SFML)
+
+## How to integrate kdtree into your cmake project
 
 in your CMakeLists.txt
 
@@ -31,7 +33,7 @@ add_subdirectory(<path-to-kdtree>)
 target_link_libraries(<your-target> kdtree)
 ```
 
-## how to use kdtree in your source
+## How to use kdtree in your source
 
 ```cpp
 // include kdtree
@@ -59,14 +61,20 @@ float r = 1.5;
 std::vector<int> indices_of_range = tree.sphericalRangeSearch(queryPoint, r);
 ```
 
-Note that `Point` must have following members.
+**Note that `Point` must have following members.**
 
 * `T Point::operator[](unsigned int) const`: element access
 * `static unsigned int Point::dim`: number of dimension
 
-## how to build visualization programs
+## How to build visualization programs
 
-set cmake option `KDTREE_VISUALIZATION` to `On`
+Run following command to retrieve external libraries.
+
+```bash
+git submodule update --init
+```
+
+Then, set cmake option `KDTREE_VISUALIZATION` to `On` and build.
 
 ```bash
 mkdir build
@@ -78,6 +86,8 @@ make
 ## Externals
 
 * [SFML 2.5](https://github.com/SFML/SFML)
+* [imgui](https://github.com/ocornut/imgui)
+* [imgui-sfml](https://github.com/eliasdaler/imgui-sfml)
 
 ## References
 

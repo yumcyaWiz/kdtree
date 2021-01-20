@@ -13,27 +13,21 @@ if(KDTREE_VISUALIZATION)
   # SFML
   find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
 
-  # nn
-  add_executable(nn examples/nn.cpp)
-  target_compile_features(nn PUBLIC cxx_std_17)
-  set_target_properties(nn PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(nn PRIVATE examples)
-  target_link_libraries(nn kdtree)
-  target_link_libraries(nn sfml-graphics sfml-window sfml-system)
+  # OpenGL
+  find_package(OpenGL REQUIRED)
 
-  # knn
-  add_executable(knn examples/knn.cpp)
-  target_compile_features(knn PUBLIC cxx_std_17)
-  set_target_properties(knn PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(knn PRIVATE examples)
-  target_link_libraries(knn kdtree)
-  target_link_libraries(knn sfml-graphics sfml-window sfml-system)
+  # externals
+  add_subdirectory(externals)
 
-  # rs
-  add_executable(sr examples/sr.cpp)
-  target_compile_features(sr PUBLIC cxx_std_17)
-  set_target_properties(sr PROPERTIES CXX_EXTENSIONS OFF)
-  target_include_directories(sr PRIVATE examples)
-  target_link_libraries(sr kdtree)
-  target_link_libraries(sr sfml-graphics sfml-window sfml-system)
+  # search
+  add_executable(search examples/search.cpp)
+  target_compile_features(search PUBLIC cxx_std_17)
+  set_target_properties(search PROPERTIES CXX_EXTENSIONS OFF)
+  target_include_directories(search PRIVATE examples)
+  target_link_libraries(search kdtree)
+  target_link_libraries(search sfml-graphics sfml-window sfml-system)
+  target_link_libraries(search OpenGL::GL)
+  target_link_libraries(search imgui)
+  target_link_libraries(search imgui-sfml)
+
 endif()
