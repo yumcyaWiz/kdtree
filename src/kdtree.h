@@ -210,7 +210,8 @@ class KdTree {
 
     std::vector<int> ret(queue.size());
     for (int i = 0; i < ret.size(); ++i) {
-      ret[i] = queue.c[i].first;
+      ret[i] = queue.top().second;
+      queue.pop();
     }
     return ret;
   }
