@@ -1,43 +1,108 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
+#include <random>
 
 // externals
 #include "imgui-SFML.h"
 #include "imgui.h"
 //
 
-#include "common.h"
 #include "kdtree/kdtree.h"
+
+// uniform random number in [0, 1]
+inline float rnd() {
+  static std::mt19937 mt(0);
+  static std::uniform_real_distribution<float> dist(0, 1);
+  return dist(mt);
+}
+
+// override sf::Vector2f to satisfy PointT requirements
+class Point2f : public sf::Vector2f {
+ public:
+  static constexpr unsigned int dim = 2;
+
+  Point2f(float x, float y) : sf::Vector2f(x, y) {}
+
+  float operator[](unsigned int i) const {
+    if (i == 0) {
+      return x;
+    } else if (i == 1) {
+      return y;
+    } else {
+      std::cerr << "invalid dimension" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  }
+};
+
+// custom sfml entity
+class Ball : public sf::Drawable {
+ private:
+  float radius;
+  sf::CircleShape circle;
+
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(circle);
+  }
+
+ public:
+  Ball(float radius) : radius(radius) {
+    circle.setRadius(radius);
+    circle.setFillColor(sf::Color::Transparent);
+    circle.setOutlineThickness(1.0);
+    circle.setOutlineColor(sf::Color::Black);
+  }
+
+  void setPosition(const sf::Vector2f& position) {
+    circle.setPosition(position - sf::Vector2f(radius, radius));
+  }
+  void setRadius(float r) {
+    radius = r;
+    circle.setRadius(r);
+  }
+  void setColor(const sf::Color& color) { circle.setOutlineColor(color); }
+};
 
 enum class SearchType { NN, KNN, SR };
 
-int main() {
-  const int width = 512;
-  const int height = 512;
-  const int n_balls = 100;
+// globals
+constexpr int width = 512;
+constexpr int height = 512;
+kdtree::KdTree<Point2f> tree;
+int n_balls = 100;
+std::vector<Point2f> points;
+int k = 5;
+float r = 100;
+std::vector<Ball> balls;
 
-  // create window
-  sf::RenderWindow window(sf::VideoMode(width, height), "kdtree - Search");
-  window.setFramerateLimit(60);
-  ImGui::SFML::Init(window);
-
+void placeBalls() {
   // place points randomly
-  std::vector<Point2f> points;
+  points.clear();
   for (int i = 0; i < n_balls; ++i) {
     points.push_back(Point2f{width * rnd(), height * rnd()});
   }
 
-  // build kd-tree
-  kdtree::KdTree<Point2f> tree(points);
-  tree.buildTree();
-
   // setup sf circle object
-  std::vector<Ball> balls;
+  balls.clear();
   for (int i = 0; i < n_balls; ++i) {
     Ball ball(5.0f);
     ball.setPosition(points[i]);
     balls.emplace_back(ball);
   }
+
+  // rebuild kd-tree
+  tree = {points};
+  tree.buildTree();
+}
+
+int main() {
+  // create window
+  sf::RenderWindow window(sf::VideoMode(width, height), "kdtree - Search");
+  window.setFramerateLimit(60);
+  ImGui::SFML::Init(window);
+
+  // setup points and balls
+  placeBalls();
 
   // mouse ball
   Ball mouseBall(100);
@@ -57,10 +122,28 @@ int main() {
     ImGui::SFML::Update(window, deltaClock.restart());
 
     // draw imgui
-    ImGui::Begin("Hello World");
+    ImGui::Begin("Parameters");
+
+    if (ImGui::InputInt("number of balls", &n_balls)) {
+      // resetup points and balls
+      placeBalls();
+    }
+
     static SearchType search_type = SearchType::NN;
     ImGui::Combo("Search Type", reinterpret_cast<int*>(&search_type),
                  "Nearest Neighbor\0k-Nearest Neighbor\0Spherical Range\0\0");
+
+    switch (search_type) {
+      case SearchType::KNN: {
+        ImGui::InputInt("k", &k);
+        break;
+      }
+      case SearchType::SR: {
+        ImGui::InputFloat("r", &r);
+        break;
+      }
+    }
+
     ImGui::End();
 
     window.clear(sf::Color::White);
@@ -70,7 +153,8 @@ int main() {
       case SearchType::NN: {
         // query nearest point to mouse cursor
         const sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        int idx_nearest = tree.searchNearest(Point2f(mousePos.x, mousePos.y));
+        const int idx_nearest =
+            tree.searchNearest(Point2f(mousePos.x, mousePos.y));
 
         // draw balls
         for (int i = 0; i < balls.size(); ++i) {
@@ -98,8 +182,8 @@ int main() {
       case SearchType::KNN: {
         // query k-nearest point to mouse cursor
         const sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-        std::vector<int> idx_nearests =
-            tree.searchKNearest(Point2f(mousePos.x, mousePos.y), 5);
+        const std::vector<int> idx_nearests =
+            tree.searchKNearest(Point2f(mousePos.x, mousePos.y), k);
 
         // make nearest point red
         for (int i = 0; i < balls.size(); ++i) {
@@ -132,12 +216,13 @@ int main() {
         // draw mouse ball
         const sf::Vector2f mousePos =
             static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+        mouseBall.setRadius(r);
         mouseBall.setPosition(mousePos);
         window.draw(mouseBall);
 
         // spherical range search
-        std::vector<int> indices =
-            tree.sphericalRangeSearch(Point2f(mousePos.x, mousePos.y), 100);
+        const std::vector<int> indices =
+            tree.sphericalRangeSearch(Point2f(mousePos.x, mousePos.y), r);
 
         // make nearest point red
         for (int i = 0; i < balls.size(); ++i) {

@@ -11,7 +11,6 @@ following features are implemented.
 |filename|description|
 |:--|:--|
 |`include/kdtree.h`|header-only implementation of kdtree|
-|`examples/common.h`|common components of visualization programs|
 |`examples/search.cpp`|visualization of neighbor search result|
 
 ## Requirements
