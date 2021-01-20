@@ -76,7 +76,7 @@ class KdTree {
     delete node;
   }
 
-  void printTreeNode(Node* node) {
+  void printTreeNode(const Node* node) const {
     std::cout << node->idx_median << std::endl;
     if (node->leftChild) {
       printTreeNode(node->leftChild);
@@ -96,8 +96,8 @@ class KdTree {
   }
 
   // search nearest neighbor node recursively
-  void searchNearestNode(Node* node, const PointT& queryPoint, int& idx_nearest,
-                         float& minDist) const {
+  void searchNearestNode(const Node* node, const PointT& queryPoint,
+                         int& idx_nearest, float& minDist) const {
     // if node is empty, exit
     if (!node) return;
 
