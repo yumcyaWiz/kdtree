@@ -39,7 +39,7 @@ class Ball : public sf::Drawable {
   }
 
  public:
-  Ball(int index, float radius) : radius(radius) {
+  Ball(float radius) : radius(radius) {
     circle.setRadius(radius);
     circle.setFillColor(sf::Color::Transparent);
     circle.setOutlineThickness(1.0);
