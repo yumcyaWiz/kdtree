@@ -92,9 +92,7 @@ int main() {
 
     // query nearest point to mouse cursor
     const sf::Vector2i mousePos = sf::Mouse::getPosition(window);
-    float minDist;
-    int idx_nearest =
-        tree.searchNearest(Point2f(mousePos.x, mousePos.y), minDist);
+    int idx_nearest = tree.searchNearest(Point2f(mousePos.x, mousePos.y));
 
     // draw balls
     for (int i = 0; i < balls.size(); ++i) {

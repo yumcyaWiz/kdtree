@@ -189,15 +189,15 @@ class KdTree {
   }
 
   // print kd-tree on terminal
-  void printTree() { printTreeNode(root); }
+  void printTree() const { printTreeNode(root); }
 
   // nearest neighbor search
   // return index of nearest neighbor point
-  int searchNearest(const PointT& queryPoint, float& minDist) const {
+  int searchNearest(const PointT& queryPoint) const {
     int idx_nearest;
-    float _minDist = std::numeric_limits<float>::max();
-    searchNearestNode(root, queryPoint, idx_nearest, _minDist);
-    minDist = _minDist;
+    // NOTE: initialize minimum squared distance to infinity
+    float minDist2 = std::numeric_limits<float>::max();
+    searchNearestNode(root, queryPoint, idx_nearest, minDist2);
     return idx_nearest;
   }
 
