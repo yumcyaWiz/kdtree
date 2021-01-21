@@ -7,6 +7,7 @@ following features are implemented.
 * Nearest neighbor search
 * k-Nearest neighbor search
 * Spherical range search
+* Graphviz dot language output
 
 |filename|description|
 |:--|:--|
@@ -80,6 +81,49 @@ mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DKDTREE_VISUALIZATION=On ..
 make
+```
+
+## Gallery
+
+### Graphviz dot language output
+
+![](img/tree.png)
+
+generated dot file
+```dot
+digraph {
+0->9 [label=0]
+9->6 [label=1]
+null60 [label="", shape="none"]
+6->null60 [label=0]
+null61 [label="", shape="none"]
+6->null61 [label=0]
+9->4 [label=1]
+null40 [label="", shape="none"]
+4->null40 [label=0]
+4->3 [label=0]
+null30 [label="", shape="none"]
+3->null30 [label=1]
+null31 [label="", shape="none"]
+3->null31 [label=1]
+0->5 [label=0]
+5->7 [label=1]
+null70 [label="", shape="none"]
+7->null70 [label=0]
+7->8 [label=0]
+null80 [label="", shape="none"]
+8->null80 [label=1]
+null81 [label="", shape="none"]
+8->null81 [label=1]
+5->2 [label=1]
+null20 [label="", shape="none"]
+2->null20 [label=0]
+2->1 [label=0]
+null10 [label="", shape="none"]
+1->null10 [label=1]
+null11 [label="", shape="none"]
+1->null11 [label=1]
+}
 ```
 
 ## Externals
