@@ -2,9 +2,11 @@
 #define _KDTREE_H
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 #include <iostream>
 #include <limits>
 #include <queue>
+#include <string>
 #include <vector>
 
 namespace kdtree {
@@ -78,13 +80,39 @@ class KdTree {
     delete node;
   }
 
-  void printTreeNode(const Node* node) const {
-    std::cout << node->idx << std::endl;
+  void toGraphVizNode(const Node* node, std::ofstream& stream) const {
     if (node->leftChild) {
-      printTreeNode(node->leftChild);
+      // draw edge
+      stream << node->idx << "->" << node->leftChild->idx
+             << " [label=" << node->axis << "]" << std::endl;
+
+      // draw child recursively
+      toGraphVizNode(node->leftChild, stream);
+    } else {
+      // create null node
+      const std::string nullNode = "null" + std::to_string(node->idx) + "0";
+      stream << nullNode << " [label=\"\", shape=\"none\"]" << std::endl;
+
+      // draw edge
+      stream << node->idx << "->" << nullNode << " [label=" << node->axis << "]"
+             << std::endl;
     }
+
     if (node->rightChild) {
-      printTreeNode(node->rightChild);
+      // draw edge
+      stream << node->idx << "->" << node->rightChild->idx
+             << " [label=" << node->axis << "]" << std::endl;
+
+      // draw child recursively
+      toGraphVizNode(node->rightChild, stream);
+    } else {
+      // create null node
+      const std::string nullNode = "null" + std::to_string(node->idx) + "1";
+      stream << nullNode << " [label=\"\", shape=\"none\"]" << std::endl;
+
+      // draw edge
+      stream << node->idx << "->" << nullNode << " [label=" << node->axis << "]"
+             << std::endl;
     }
   }
 
@@ -224,8 +252,20 @@ class KdTree {
     root = buildNode(indices.data(), points.size(), 0);
   }
 
-  // print kd-tree on terminal
-  void printTree() const { printTreeNode(root); }
+  // output tree as graphviz dot file
+  void toGraphviz(const std::string& filename) const {
+    std::ofstream file(filename);
+    if (!file) {
+      std::cerr << "failed to create " << filename << std::endl;
+    }
+
+    // write dot
+    file << "digraph {" << std::endl;
+    toGraphVizNode(root, file);
+    file << "}" << std::endl;
+
+    file.close();
+  }
 
   // nearest neighbor search
   // return index of nearest neighbor point
