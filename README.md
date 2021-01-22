@@ -1,6 +1,6 @@
 # kdtree
 
-header-only implementation of kdtree and visualization.
+header-only implementation of kdtree.
 
 following features are implemented.
 
@@ -13,6 +13,7 @@ following features are implemented.
 |:--|:--|
 |`include/kdtree.h`|header-only implementation of kdtree|
 |`examples/search.cpp`|visualization of neighbor search result|
+|`examples/physics.cpp`|physics simulation of balls|
 
 ## Requirements
 
