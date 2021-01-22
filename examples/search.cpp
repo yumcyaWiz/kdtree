@@ -14,36 +14,6 @@
 
 enum class SearchType { NN, KNN, SR };
 
-// custom sfml entity
-class Ball : public sf::Drawable {
- private:
-  float radius;
-  sf::CircleShape circle;
-
-  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(circle);
-  }
-
- public:
-  Ball(float radius) : radius(radius) {
-    circle.setRadius(radius);
-    circle.setFillColor(sf::Color::Transparent);
-    circle.setOutlineThickness(1.0);
-    circle.setOutlineColor(sf::Color::Black);
-  }
-
-  void setPosition(const sf::Vector2f& position) {
-    circle.setPosition(position - sf::Vector2f(radius, radius));
-  }
-
-  void setRadius(float r) {
-    radius = r;
-    circle.setRadius(r);
-  }
-
-  void setColor(const sf::Color& color) { circle.setOutlineColor(color); }
-};
-
 // globals
 constexpr int width = 512;
 constexpr int height = 512;
@@ -51,25 +21,17 @@ int n_balls = 100;
 int k = 5;
 float r = 100;
 std::vector<Ball> balls;
-std::vector<Point2f> points;
-kdtree::KdTree<Point2f> tree;
+kdtree::KdTree<Ball> tree;
 
 void placeBalls() {
-  // place points randomly
-  points.clear();
-  for (int i = 0; i < n_balls; ++i) {
-    points.emplace_back(width * rnd(), height * rnd());
-  }
-
-  // setup balls
+  // place balls randomly
   balls.clear();
   for (int i = 0; i < n_balls; ++i) {
-    balls.emplace_back(5.0f);
-    balls[i].setPosition(points[i]);
+    balls.emplace_back(sf::Vector2f(width * rnd(), height * rnd()), 5.0f);
   }
 
   // build kd-tree
-  tree = {points};
+  tree = {balls};
   tree.buildTree();
 }
 
@@ -83,7 +45,7 @@ int main() {
   placeBalls();
 
   // mouse ball
-  Ball mouseBall(100);
+  Ball mouseBall(sf::Vector2f(), 100);
   mouseBall.setColor(sf::Color::Blue);
 
   // app loop
@@ -149,7 +111,7 @@ int main() {
         sf::Vertex line[2];
         line[0].position = sf::Vector2f(mousePos);
         line[0].color = sf::Color::Blue;
-        line[1].position = points[idx_nearest];
+        line[1].position = balls[idx_nearest].getPosition();
         line[1].color = sf::Color::Blue;
         window.draw(line, 2, sf::LineStrip);
 
@@ -181,7 +143,7 @@ int main() {
           sf::Vertex line[2];
           line[0].position = sf::Vector2f(mousePos);
           line[0].color = sf::Color::Blue;
-          line[1].position = points[idx_nearests[i]];
+          line[1].position = balls[idx_nearests[i]].getPosition();
           line[1].color = sf::Color::Blue;
           window.draw(line, 2, sf::LineStrip);
         }

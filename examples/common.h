@@ -31,3 +31,51 @@ class Point2f : public sf::Vector2f {
     }
   }
 };
+
+// ball entity
+class Ball : public sf::Drawable {
+ private:
+  sf::Vector2f position;
+  float radius;
+  sf::CircleShape circle;
+
+  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
+    target.draw(circle);
+  }
+
+ public:
+  static constexpr unsigned int dim = 2;
+
+  Ball(const sf::Vector2f& position, float radius) {
+    setRadius(radius);
+    setPosition(position);
+    circle.setFillColor(sf::Color::Transparent);
+    circle.setOutlineThickness(1.0);
+    circle.setOutlineColor(sf::Color::Black);
+  }
+
+  float operator[](unsigned int i) const {
+    if (i == 0) {
+      return position.x;
+    } else if (i == 1) {
+      return position.y;
+    } else {
+      std::cerr << "invalid dimension" << std::endl;
+      std::exit(EXIT_FAILURE);
+    }
+  }
+
+  sf::Vector2f getPosition() const { return position; }
+
+  void setPosition(const sf::Vector2f& position) {
+    this->position = position;
+    circle.setPosition(position - sf::Vector2f(radius, radius));
+  }
+
+  void setRadius(float r) {
+    radius = r;
+    circle.setRadius(r);
+  }
+
+  void setColor(const sf::Color& color) { circle.setOutlineColor(color); }
+};
