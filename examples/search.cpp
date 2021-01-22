@@ -24,8 +24,8 @@ std::vector<Ball> balls;
 kdtree::KdTree<Ball> tree;
 
 void placeBalls() {
-  // place balls randomly
   balls.clear();
+  // place balls randomly
   for (int i = 0; i < n_balls; ++i) {
     balls.emplace_back(sf::Vector2f(width * rnd(), height * rnd()), 5.0f);
   }
@@ -64,7 +64,7 @@ int main() {
     // draw imgui
     ImGui::Begin("Parameters");
 
-    if (ImGui::InputInt("number of balls", &n_balls)) {
+    if (ImGui::InputInt("Number of balls", &n_balls)) {
       // resetup points and balls
       placeBalls();
     }

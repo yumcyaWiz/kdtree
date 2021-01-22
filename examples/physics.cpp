@@ -99,6 +99,20 @@ int main() {
     const sf::Time dt = deltaClock.restart();
     ImGui::SFML::Update(window, dt);
 
+    // draw imgui
+    ImGui::Begin("Parameters");
+
+    if (ImGui::InputInt("Number of balls", &n_balls)) {
+      // resetup balls
+      placeBalls();
+    }
+
+    ImGui::InputFloat("G", &G);
+    ImGui::InputFloat("Restitution", &E);
+    ImGui::InputFloat("Air Drag", &K);
+
+    ImGui::End();
+
     window.clear(sf::Color::White);
 
     // rebuild kd-tree
