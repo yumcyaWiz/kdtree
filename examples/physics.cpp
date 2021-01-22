@@ -121,6 +121,8 @@ int main() {
     tree.buildTree();
 
     for (int i = 0; i < n_balls; ++i) {
+      balls[i].setColor(sf::Color::Black);
+
       const sf::Vector2f position = balls[i].getPosition();
       const sf::Vector2f velocity = balls[i].getVelocity();
       const float mass = balls[i].getMass();
@@ -148,7 +150,7 @@ int main() {
 
       // collision check with kd-tree
       std::vector<int> indices_of_collision_candidate =
-          tree.sphericalRangeSearch(balls[i], 2.0f * radius1);
+          tree.sphericalRangeSearch(balls[i], 4.0f * radius1);
       for (int k = 0; k < indices_of_collision_candidate.size(); ++k) {
         const int idx = indices_of_collision_candidate[k];
         // skip itself
@@ -163,6 +165,9 @@ int main() {
         const float dist = norm(position - position2);
         const float diff = (radius1 + radius2) - dist;
         if (diff > 0) {
+          balls[i].setColor(sf::Color::Red);
+          balls[idx].setColor(sf::Color::Red);
+
           const sf::Vector2f v12 = normalize(position - position2);
 
           //
