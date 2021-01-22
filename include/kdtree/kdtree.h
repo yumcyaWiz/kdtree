@@ -241,7 +241,7 @@ class KdTree {
   KdTree(std::initializer_list<PointT> init) : root(nullptr), points(init) {}
   KdTree(const std::vector<PointT>& points) : root(nullptr), points(points) {}
 
-  ~KdTree() { destructNode(root); }
+  ~KdTree() { destructTree(); }
 
   // build kd-tree
   void buildTree() {
@@ -252,6 +252,9 @@ class KdTree {
     // build tree recursively
     root = buildNode(indices.data(), points.size(), 0);
   }
+
+  // destruct kd-tree
+  void destructTree() { destructNode(root); }
 
   // output tree as graphviz dot file
   void toGraphviz(const std::string& filename) const {
