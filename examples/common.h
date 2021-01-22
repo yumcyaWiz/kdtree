@@ -34,7 +34,7 @@ class Point2f : public sf::Vector2f {
 
 // ball entity
 class Ball : public sf::Drawable {
- private:
+ protected:
   sf::Vector2f position;
   float radius;
   sf::CircleShape circle;

@@ -14,65 +14,33 @@
 //
 #include "common.h"
 
+// vector utils
 float norm(const sf::Vector2f& v) { return std::sqrt(v.x * v.x + v.y * v.y); }
 float norm2(const sf::Vector2f& v) { return v.x * v.x + v.y * v.y; }
 
 sf::Vector2f normalize(const sf::Vector2f& v) { return v / norm(v); }
 
-// custom sfml entity
-class PhysicsBall : public sf::Drawable {
+// Ball entity with Physics
+class PhysicsBall : public Ball {
  private:
-  sf::Vector2f position;
   sf::Vector2f velocity;
   sf::Vector2f acceleration;
   float mass;
-  float radius;
-  sf::CircleShape circle;
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
     target.draw(circle);
   }
 
  public:
-  static constexpr unsigned int dim = 2;
-
   PhysicsBall(const sf::Vector2f& position, float radius)
-      : position(position), radius(radius) {
-    setPosition(position);
-    setRadius(radius);
-    circle.setFillColor(sf::Color::Transparent);
-    circle.setOutlineThickness(1.0);
-    circle.setOutlineColor(sf::Color::Black);
+      : Ball(position, radius) {
+    mass = 3.14 * radius * radius;
   }
 
-  float operator[](unsigned int i) const {
-    if (i == 0) {
-      return position.x;
-    } else if (i == 1) {
-      return position.y;
-    } else {
-      std::cerr << "invalid dimension" << std::endl;
-      std::exit(EXIT_FAILURE);
-    }
-  }
-
-  void setRadius(float r) {
-    radius = r;
-    mass = 3.14 * r * r;
-    circle.setRadius(r);
-  }
-
-  void setColor(const sf::Color& color) { circle.setOutlineColor(color); }
-
-  sf::Vector2f getPosition() const { return position; }
   sf::Vector2f getVelocity() const { return velocity; }
   float getMass() const { return mass; }
   float getRadius() const { return radius; }
 
-  void setPosition(const sf::Vector2f& position) {
-    this->position = position;
-    circle.setPosition(position - sf::Vector2f(radius, radius));
-  }
   void setVelocity(const sf::Vector2f& velocity) { this->velocity = velocity; }
 
   void applyForce(const sf::Vector2f& force) { acceleration = force / mass; }
@@ -148,20 +116,20 @@ int main() {
       // reflect x
       if (position.x < 0) {
         balls[i].setPosition(sf::Vector2f(0, position.y));
-        balls[i].setVelocity(sf::Vector2f(-velocity.x, velocity.y) * E);
+        balls[i].setVelocity(E * sf::Vector2f(-velocity.x, velocity.y));
       }
       if (position.x > width) {
         balls[i].setPosition(sf::Vector2f(width, position.y));
-        balls[i].setVelocity(sf::Vector2f(-velocity.x, velocity.y) * E);
+        balls[i].setVelocity(E * sf::Vector2f(-velocity.x, velocity.y));
       }
       // reflect y
       if (position.y < 0) {
         balls[i].setPosition(sf::Vector2f(position.x, 0));
-        balls[i].setVelocity(sf::Vector2f(velocity.x, -velocity.y) * E);
+        balls[i].setVelocity(E * sf::Vector2f(velocity.x, -velocity.y));
       }
       if (position.y > height) {
         balls[i].setPosition(sf::Vector2f(position.x, height));
-        balls[i].setVelocity(sf::Vector2f(velocity.x, -velocity.y) * E);
+        balls[i].setVelocity(E * sf::Vector2f(velocity.x, -velocity.y));
       }
 
       // collision check with kd-tree
@@ -183,9 +151,11 @@ int main() {
         if (diff > 0) {
           const sf::Vector2f v12 = normalize(position - position2);
 
+          //
           balls[i].setPosition(position + 0.5f * diff * v12);
           balls[idx].setPosition(position2 - 0.5f * diff * v12);
 
+          // update velocity
           const sf::Vector2f vel_diff = velocity - velocity2;
           const float lambda = -2.0f * E * (mass * mass2) / (mass + mass2) *
                                (vel_diff.x * v12.x + vel_diff.y * v12.y);
