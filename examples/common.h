@@ -17,6 +17,8 @@ class Point2f : public sf::Vector2f {
   static constexpr unsigned int dim = 2;
 
   Point2f(float x, float y) : sf::Vector2f(x, y) {}
+  template <typename T>
+  Point2f(const sf::Vector2<T>& point) : sf::Vector2f(point) {}
 
   float operator[](unsigned int i) const {
     if (i == 0) {
@@ -28,32 +30,4 @@ class Point2f : public sf::Vector2f {
       std::exit(EXIT_FAILURE);
     }
   }
-};
-
-// custom sfml entity
-class Ball : public sf::Drawable {
- private:
-  float radius;
-  sf::CircleShape circle;
-
-  virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
-    target.draw(circle);
-  }
-
- public:
-  Ball(float radius) : radius(radius) {
-    circle.setRadius(radius);
-    circle.setFillColor(sf::Color::Transparent);
-    circle.setOutlineThickness(1.0);
-    circle.setOutlineColor(sf::Color::Black);
-  }
-
-  void setPosition(const sf::Vector2f& position) {
-    circle.setPosition(position - sf::Vector2f(radius, radius));
-  }
-  void setRadius(float r) {
-    radius = r;
-    circle.setRadius(r);
-  }
-  void setColor(const sf::Color& color) { circle.setOutlineColor(color); }
 };
