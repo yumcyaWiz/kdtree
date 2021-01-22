@@ -12,6 +12,17 @@
 
 namespace kdtree {
 
+// compute squared distance between given points
+// NOTE: assume PointT and PointU has the same dimension
+template <typename PointT, typename PointU>
+static float distance2(const PointT& p1, const PointU& p2) {
+  float dist2 = 0;
+  for (int i = 0; i < PointT::dim; ++i) {
+    dist2 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
+  }
+  return dist2;
+}
+
 // PointT: point type
 // PointT must have following property
 // unsigned int PointT::dim                   dimmension
@@ -117,17 +128,9 @@ class KdTree {
     }
   }
 
-  // compute squared distance between given points
-  static float distance2(const PointT& p1, const PointT& p2) {
-    float dist2 = 0;
-    for (int i = 0; i < PointT::dim; ++i) {
-      dist2 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
-    }
-    return dist2;
-  }
-
   // search nearest neighbor node recursively
-  void searchNearestNode(const Node* node, const PointT& queryPoint,
+  template <typename PointU>
+  void searchNearestNode(const Node* node, const PointU& queryPoint,
                          int& idx_nearest, float& minDist2) const {
     if (!node) return;
 
@@ -164,7 +167,8 @@ class KdTree {
 
   // search k-nearest neighbor nodes recursively
   using KNNQueue = std::priority_queue<std::pair<float, int>>;
-  void searchKNearestNode(const Node* node, const PointT& queryPoint, int k,
+  template <typename PointU>
+  void searchKNearestNode(const Node* node, const PointU& queryPoint, int k,
                           KNNQueue& queue) const {
     if (!node) return;
 
@@ -202,7 +206,8 @@ class KdTree {
   }
 
   // range search with radius r sphere.
-  void sphericalRangeSearchNode(const Node* node, const PointT& queryPoint,
+  template <typename PointU>
+  void sphericalRangeSearchNode(const Node* node, const PointU& queryPoint,
                                 float r, std::vector<int>& list) const {
     if (!node) return;
 
@@ -273,7 +278,8 @@ class KdTree {
 
   // nearest neighbor search
   // return index of nearest neighbor point
-  int searchNearest(const PointT& queryPoint) const {
+  template <typename PointU>
+  int searchNearest(const PointU& queryPoint) const {
     int idx_nearest;
     // NOTE: initialize minimum squared distance to infinity
     float minDist2 = std::numeric_limits<float>::max();
@@ -283,7 +289,8 @@ class KdTree {
 
   // k-nearest neighbor search
   // return indices of k-nearest neighbor points
-  std::vector<int> searchKNearest(const PointT& queryPoint, int k) const {
+  template <typename PointU>
+  std::vector<int> searchKNearest(const PointU& queryPoint, int k) const {
     KNNQueue queue;
     searchKNearestNode(root, queryPoint, k, queue);
 
@@ -296,7 +303,8 @@ class KdTree {
   }
 
   // range search with radius r sphere centered at query point
-  std::vector<int> sphericalRangeSearch(const PointT& queryPoint,
+  template <typename PointU>
+  std::vector<int> sphericalRangeSearch(const PointU& queryPoint,
                                         float r) const {
     std::vector<int> ret;
     sphericalRangeSearchNode(root, queryPoint, r, ret);
