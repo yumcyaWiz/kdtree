@@ -11,7 +11,7 @@ following features are implemented.
 
 |filename|description|
 |:--|:--|
-|`include/kdtree.h`|header-only implementation of kdtree|
+|`include/kdtree.h`|header-only implementation of kd-tree|
 |`examples/search.cpp`|visualization of neighbor search result|
 |`examples/physics.cpp`|physics simulation of balls|
 
@@ -20,7 +20,7 @@ following features are implemented.
 * C++17
 * CMake 3.12 or Higher
 
-if you want to build visualization programs, you also need followings.
+if you want to build examples, you also need followings.
 
 * OpenGL 3.1
 * [SFML 2.5](https://github.com/SFML/SFML)
@@ -67,7 +67,7 @@ std::vector<int> indices_of_range = tree.sphericalRangeSearch(queryPoint, r);
 * `T Point::operator[](unsigned int) const`: element access
 * `static unsigned int Point::dim`: number of dimension
 
-## How to build visualization programs
+## How to build examples
 
 Run following command to retrieve external libraries.
 
@@ -75,12 +75,12 @@ Run following command to retrieve external libraries.
 git submodule update --init
 ```
 
-Then, set cmake option `KDTREE_VISUALIZATION` to `On` and build.
+Then, set cmake option `KDTREE_EXAMPLES` to `On` and build.
 
 ```bash
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DKDTREE_VISUALIZATION=On ..
+cmake -DCMAKE_BUILD_TYPE=Release -DKDTREE_EXAMPLES=On ..
 make
 ```
 
@@ -89,6 +89,10 @@ make
 ### Nearest Neighbor Search
 
 ![](https://user-images.githubusercontent.com/23396435/105570229-3cfd4280-5d8b-11eb-866e-d085d5acb08d.gif)
+
+### Physics
+
+![](https://user-images.githubusercontent.com/23396435/105575021-b573fb80-5dab-11eb-8660-2dfd498b4d1d.gif)
 
 ### Graphviz dot language output
 
