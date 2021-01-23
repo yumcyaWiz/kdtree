@@ -63,6 +63,7 @@ class PhysicsBall : public Ball {
 constexpr int width = 512;
 constexpr int height = 512;
 int n_balls = 1000;
+float timeScale = 1.0f;
 float G = 0.0f;   // gravitational acceleration
 float E = 1.0f;   // coefficient of restitution
 float K = 0.25f;  // coefficient of air drag
@@ -118,6 +119,7 @@ int main() {
       placeBalls();
     }
 
+    ImGui::InputFloat("Timescale", &timeScale);
     ImGui::InputFloat("G", &G);
     ImGui::InputFloat("Restitution", &E);
     ImGui::InputFloat("Air Drag", &K);
@@ -182,8 +184,8 @@ int main() {
 
           const sf::Vector2f v12 = normalize(position - position2);
 
-          balls[i].setPosition(position + 0.5f * diff * v12);
-          balls[idx].setPosition(position2 - 0.5f * diff * v12);
+          balls[i].setPosition(position + 1.0f * diff * v12);
+          balls[idx].setPosition(position2 - 1.0f * diff * v12);
 
           // update velocity
           const sf::Vector2f vel_diff = velocity - velocity2;
@@ -226,7 +228,7 @@ int main() {
       balls[i].applyForce(-K * norm2(velocity) * normalize(velocity));
 
       // update
-      balls[i].update(2.0f * dt.asSeconds());
+      balls[i].update(timeScale * dt.asSeconds());
 
       // draw
       window.draw(balls[i]);
