@@ -25,6 +25,7 @@ class PhysicsBall : public Ball {
  private:
   sf::Vector2f velocity;
   sf::Vector2f acceleration;
+  sf::Vector2f force;
   float mass;
 
   virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const {
@@ -39,16 +40,22 @@ class PhysicsBall : public Ball {
 
   sf::Vector2f getVelocity() const { return velocity; }
   float getMass() const { return mass; }
-  float getRadius() const { return radius; }
 
   void setVelocity(const sf::Vector2f& velocity) { this->velocity = velocity; }
 
-  void applyForce(const sf::Vector2f& force) { acceleration = force / mass; }
+  void applyForce(const sf::Vector2f& force) { this->force += force; }
 
   void update(float dt) {
+    // a = F / m
+    acceleration = force / mass;
+
+    // euler method
     position += velocity * dt;
     setPosition(position);
     velocity += acceleration * dt;
+
+    // clear force
+    force = sf::Vector2f(0, 0);
   }
 };
 
@@ -85,6 +92,10 @@ int main() {
   // setup balls
   placeBalls();
 
+  // mouse ball
+  Ball mouseBall(sf::Vector2f(), 50.0f);
+  mouseBall.setColor(sf::Color::Blue);
+
   // app loop
   sf::Clock deltaClock;
   while (window.isOpen()) {
@@ -120,37 +131,38 @@ int main() {
     tree = {balls};
     tree.buildTree();
 
+    // collision check
     for (int i = 0; i < n_balls; ++i) {
       balls[i].setColor(sf::Color::Black);
 
       const sf::Vector2f position = balls[i].getPosition();
       const sf::Vector2f velocity = balls[i].getVelocity();
       const float mass = balls[i].getMass();
-      const float radius1 = balls[i].getRadius();
+      const float radius = balls[i].getRadius();
 
       // collision with wall
       // reflect x
-      if (position.x < 0) {
-        balls[i].setPosition(sf::Vector2f(0, position.y));
+      if (position.x - radius < 0) {
+        balls[i].setPosition(sf::Vector2f(radius, position.y));
         balls[i].setVelocity(E * sf::Vector2f(-velocity.x, velocity.y));
       }
-      if (position.x > width) {
-        balls[i].setPosition(sf::Vector2f(width, position.y));
+      if (position.x + radius > width) {
+        balls[i].setPosition(sf::Vector2f(width - radius, position.y));
         balls[i].setVelocity(E * sf::Vector2f(-velocity.x, velocity.y));
       }
       // reflect y
-      if (position.y < 0) {
-        balls[i].setPosition(sf::Vector2f(position.x, 0));
+      if (position.y - radius < 0) {
+        balls[i].setPosition(sf::Vector2f(position.x, radius));
         balls[i].setVelocity(E * sf::Vector2f(velocity.x, -velocity.y));
       }
-      if (position.y > height) {
-        balls[i].setPosition(sf::Vector2f(position.x, height));
+      if (position.y + radius > height) {
+        balls[i].setPosition(sf::Vector2f(position.x, height - radius));
         balls[i].setVelocity(E * sf::Vector2f(velocity.x, -velocity.y));
       }
 
       // collision check with kd-tree
-      std::vector<int> indices_of_collision_candidate =
-          tree.sphericalRangeSearch(balls[i], 4.0f * radius1);
+      const std::vector<int> indices_of_collision_candidate =
+          tree.sphericalRangeSearch(balls[i], 4.0f * radius);
       for (int k = 0; k < indices_of_collision_candidate.size(); ++k) {
         const int idx = indices_of_collision_candidate[k];
         // skip itself
@@ -163,14 +175,13 @@ int main() {
 
         // check collision precisely
         const float dist = norm(position - position2);
-        const float diff = (radius1 + radius2) - dist;
+        const float diff = (radius + radius2) - dist;
         if (diff > 0) {
           balls[i].setColor(sf::Color::Red);
           balls[idx].setColor(sf::Color::Red);
 
           const sf::Vector2f v12 = normalize(position - position2);
 
-          //
           balls[i].setPosition(position + 0.5f * diff * v12);
           balls[idx].setPosition(position2 - 0.5f * diff * v12);
 
@@ -182,15 +193,39 @@ int main() {
           balls[idx].setVelocity(velocity2 - v12 * lambda / mass2);
         }
       }
+    }
+
+    // mouse effect
+    const sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+    mouseBall.setPosition(sf::Vector2f(mousePos));
+    window.draw(mouseBall);
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+      const std::vector<int> indices_of_near_balls =
+          tree.sphericalRangeSearch(Point2f(mousePos), mouseBall.getRadius());
+
+      for (int i = 0; i < indices_of_near_balls.size(); ++i) {
+        const int idx = indices_of_near_balls[i];
+        const sf::Vector2f direction =
+            normalize(balls[idx].getPosition() - sf::Vector2f(mousePos));
+
+        balls[idx].applyForce(1000.0f * balls[idx].getMass() * direction);
+      }
+    }
+
+    // compute force and update physical quantity
+    for (int i = 0; i < n_balls; ++i) {
+      const sf::Vector2f position = balls[i].getPosition();
+      const sf::Vector2f velocity = balls[i].getVelocity();
+      const float mass = balls[i].getMass();
+      const float radius = balls[i].getRadius();
 
       // gravity
-      sf::Vector2f force = sf::Vector2f(0, G * mass);
+      balls[i].applyForce(sf::Vector2f(0, G * mass));
 
       // air drag
-      force += -K * norm2(velocity) * normalize(velocity);
+      balls[i].applyForce(-K * norm2(velocity) * normalize(velocity));
 
       // update
-      balls[i].applyForce(force);
       balls[i].update(2.0f * dt.asSeconds());
 
       // draw

@@ -66,6 +66,7 @@ class Ball : public sf::Drawable {
   }
 
   sf::Vector2f getPosition() const { return position; }
+  float getRadius() const { return radius; }
 
   void setPosition(const sf::Vector2f& position) {
     this->position = position;
