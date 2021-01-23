@@ -1,6 +1,6 @@
 # kdtree
 
-header-only implementation of kdtree.
+header-only implementation of kd-tree.
 
 following features are implemented.
 
@@ -85,6 +85,10 @@ make
 ```
 
 ## Gallery
+
+### Nearest Neighbor Search
+
+![](https://user-images.githubusercontent.com/23396435/105570229-3cfd4280-5d8b-11eb-866e-d085d5acb08d.gif)
 
 ### Graphviz dot language output
 
