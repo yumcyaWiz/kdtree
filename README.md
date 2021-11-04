@@ -69,7 +69,7 @@ std::vector<int> indices_of_range = tree.sphericalRangeSearch(queryPoint, r);
 
 ## How to build examples
 
-Run following command to retrieve external libraries.
+Run following command to get external libraries.
 
 ```bash
 git submodule update --init
@@ -91,6 +91,8 @@ make
 ![](https://user-images.githubusercontent.com/23396435/105570229-3cfd4280-5d8b-11eb-866e-d085d5acb08d.gif)
 
 ### Physics
+
+Collision detection with kd-tree.
 
 ![](https://user-images.githubusercontent.com/23396435/105575021-b573fb80-5dab-11eb-8660-2dfd498b4d1d.gif)
 
