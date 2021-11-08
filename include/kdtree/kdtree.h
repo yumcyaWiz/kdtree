@@ -15,7 +15,7 @@ namespace kdtree {
 // compute squared distance between given points
 // NOTE: assume PointT and PointU has the same dimension
 template <typename PointT, typename PointU>
-static float distance2(const PointT& p1, const PointU& p2) {
+inline float distance2(const PointT& p1, const PointU& p2) {
   float dist2 = 0;
   for (int i = 0; i < PointT::dim; ++i) {
     dist2 += (p1[i] - p2[i]) * (p1[i] - p2[i]);
