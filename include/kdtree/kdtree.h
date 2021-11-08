@@ -23,7 +23,7 @@ static float distance2(const PointT& p1, const PointU& p2) {
   return dist2;
 }
 
-// PointT: point type
+// PointT: user defined point type
 // PointT must have following property
 // unsigned int PointT::dim                   dimmension
 // T PointT::operator[](unsigned int) const   element access
