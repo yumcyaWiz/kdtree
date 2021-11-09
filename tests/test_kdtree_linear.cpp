@@ -3,7 +3,7 @@
 #include <random>
 #include <vector>
 
-#include "kdtree/kdtree.h"
+#include "kdtree/kdtree_linear.h"
 
 // user defined point class
 struct Point {
@@ -27,12 +27,6 @@ float distance2(const Point& p1, const Point& p2) {
   }
   return ret;
 }
-
-// [0, 1] uniform random
-std::random_device rnd_dev;
-std::mt19937 rng(rnd_dev());
-std::uniform_real_distribution<float> dist(0, 1);
-float rnd() { return dist(rng); }
 
 bool test_search_nearest(const std::vector<Point>& points,
                          const Point& query_point) {
@@ -107,8 +101,14 @@ bool test_search_k_nearest(const std::vector<Point>& points,
   return success;
 }
 
+// [0, 1] uniform random
+std::random_device rnd_dev;
+std::mt19937 rng(rnd_dev());
+std::uniform_real_distribution<float> dist(0, 1);
+float rnd() { return dist(rng); }
+
 int main() {
-  const int N = 3;
+  const int N = 100;
   const int k = 3;
 
   // generate random points
