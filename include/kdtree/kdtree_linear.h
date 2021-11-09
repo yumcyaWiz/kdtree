@@ -31,7 +31,7 @@ inline float distance2(const PointT& p1, const PointU& p2) {
 template <typename PointT>
 class KdTree {
  private:
-  struct alignas(16) Node {
+  struct Node {
     int axis;           // separation axis
     int idx;            // index of median point
     int leftChildIdx;   // index of left child

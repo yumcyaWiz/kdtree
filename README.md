@@ -12,6 +12,7 @@ following features are implemented.
 |filename|description|
 |:--|:--|
 |`include/kdtree.h`|header-only implementation of kd-tree|
+|`include/kdtree_linear.h`|linear array version of `include/kdtree.h`. This is more efficient.|
 |`examples/search.cpp`|visualization of neighbor search result|
 |`examples/physics.cpp`|physics simulation of balls|
 
