@@ -229,6 +229,44 @@ class KdTree {
     }
   }
 
+  // range search with radius r sphere
+  template <typename PointU>
+  void sphericalRangeSearchNode(int nodeIdx, const PointU& queryPoint, float r,
+                                std::vector<int>& list) const {
+    if (nodeIdx >= nodes.size()) return;
+
+    const Node& node = nodes[nodeIdx];
+
+    // median point
+    const PointT& median = points[node.idx];
+
+    // if distance from query point to median point is smaller than radius, add
+    // median point to list
+    const float dist2 = distance2(queryPoint, median);
+    if (dist2 < r * r) {
+      list.push_back(node.idx);
+    }
+
+    // if query point is lower than median, search left child
+    // else, search right child
+    const bool isLower = queryPoint[node.axis] < median[node.axis];
+    if (isLower) {
+      sphericalRangeSearchNode(node.leftChildIdx, queryPoint, r, list);
+    } else {
+      sphericalRangeSearchNode(node.rightChildIdx, queryPoint, r, list);
+    }
+
+    // at leaf node, if sphere overlaps sibblings region, search sibbligs
+    const float dist_to_siblings = median[node.axis] - queryPoint[node.axis];
+    if (r * r > dist_to_siblings * dist_to_siblings) {
+      if (isLower) {
+        sphericalRangeSearchNode(node.rightChildIdx, queryPoint, r, list);
+      } else {
+        sphericalRangeSearchNode(node.leftChildIdx, queryPoint, r, list);
+      }
+    }
+  }
+
  public:
   KdTree() {}
   KdTree(std::initializer_list<PointT> init) : points(init) {}
@@ -282,6 +320,15 @@ class KdTree {
       ret[i] = queue.top().second;
       queue.pop();
     }
+    return ret;
+  }
+
+  // range search with radius r sphere centered at query point
+  template <typename PointU>
+  std::vector<int> sphericalRangeSearch(const PointU& queryPoint,
+                                        float r) const {
+    std::vector<int> ret;
+    sphericalRangeSearchNode(0, queryPoint, r, ret);
     return ret;
   }
 };
