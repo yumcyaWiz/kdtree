@@ -12,9 +12,17 @@
 
 namespace kdtree {
 
+// Point concept
+template <typename T>
+concept Point = requires(T& x, int i) {
+  { T::dim } -> std::convertible_to<int>;  // dimension
+  { x[i] } -> std::convertible_to<float>;  // element access
+};
+
 // compute squared distance between given points
 // NOTE: assume PointT and PointU has the same dimension
 template <typename PointT, typename PointU>
+requires Point<PointT> && Point<PointU>
 inline float distance2(const PointT& p1, const PointU& p2) {
   float dist2 = 0;
   for (int i = 0; i < PointT::dim; ++i) {
@@ -24,11 +32,8 @@ inline float distance2(const PointT& p1, const PointU& p2) {
 }
 
 // PointT: user defined point type
-// PointT must have following property
-// unsigned int PointT::dim                   dimmension
-// T PointT::operator[](unsigned int) const   element access
-// TODO: use concept in C++20
 template <typename PointT>
+requires Point<PointT>
 class KdTree {
  private:
   struct Node {
