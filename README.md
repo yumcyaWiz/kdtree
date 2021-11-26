@@ -18,8 +18,8 @@ following features are implemented.
 
 ## Requirements
 
-* C++17
-* CMake 3.12 or Higher
+* C++ (>=20)
+* CMake (>=3.12)
 
 if you want to build examples, you also need followings.
 

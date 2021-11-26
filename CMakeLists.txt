@@ -6,7 +6,7 @@ option(KDTREE_EXAMPLES "build examples" OFF)
 
 # kdtree
 add_library(kdtree INTERFACE)
-target_compile_features(kdtree INTERFACE cxx_std_17)
+target_compile_features(kdtree INTERFACE cxx_std_20)
 target_include_directories(kdtree INTERFACE include)
 
 if(KDTREE_TESTS)
