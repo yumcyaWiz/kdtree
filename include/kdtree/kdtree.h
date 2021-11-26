@@ -135,6 +135,7 @@ class KdTree {
 
   // search nearest neighbor node recursively
   template <typename PointU>
+  requires Point<PointU>
   void searchNearestNode(const Node* node, const PointU& queryPoint,
                          int& idx_nearest, float& minDist2) const {
     if (!node) return;
@@ -173,6 +174,7 @@ class KdTree {
   // search k-nearest neighbor nodes recursively
   using KNNQueue = std::priority_queue<std::pair<float, int>>;
   template <typename PointU>
+  requires Point<PointU>
   void searchKNearestNode(const Node* node, const PointU& queryPoint, int k,
                           KNNQueue& queue) const {
     if (!node) return;
@@ -212,6 +214,7 @@ class KdTree {
 
   // range search with radius r sphere.
   template <typename PointU>
+  requires Point<PointU>
   void sphericalRangeSearchNode(const Node* node, const PointU& queryPoint,
                                 float r, std::vector<int>& list) const {
     if (!node) return;
@@ -284,6 +287,7 @@ class KdTree {
   // nearest neighbor search
   // return index of nearest neighbor point
   template <typename PointU>
+  requires Point<PointU>
   int searchNearest(const PointU& queryPoint) const {
     int idx_nearest;
     // NOTE: initialize minimum squared distance to infinity
@@ -295,7 +299,9 @@ class KdTree {
   // k-nearest neighbor search
   // return indices of k-nearest neighbor points
   template <typename PointU>
-  std::vector<int> searchKNearest(const PointU& queryPoint, int k) const {
+  requires Point<PointU> std::vector<int> searchKNearest(
+      const PointU& queryPoint, int k)
+  const {
     KNNQueue queue;
     searchKNearestNode(root, queryPoint, k, queue);
 
@@ -309,8 +315,9 @@ class KdTree {
 
   // range search with radius r sphere centered at query point
   template <typename PointU>
-  std::vector<int> sphericalRangeSearch(const PointU& queryPoint,
-                                        float r) const {
+  requires Point<PointU> std::vector<int> sphericalRangeSearch(
+      const PointU& queryPoint, float r)
+  const {
     std::vector<int> ret;
     sphericalRangeSearchNode(root, queryPoint, r, ret);
     return ret;
