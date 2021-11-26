@@ -161,7 +161,7 @@ class KdTree {
   requires Point<PointU>
   void searchNearestNode(int nodeIdx, const PointU& queryPoint,
                          int& idx_nearest, float& minDist2) const {
-    if (nodeIdx >= nodes.size()) return;
+    if (nodeIdx == -1) return;
 
     const Node& node = nodes[nodeIdx];
 
@@ -203,7 +203,7 @@ class KdTree {
   requires Point<PointU>
   void searchKNearestNode(int nodeIdx, const PointU& queryPoint, int k,
                           KNNQueue& queue) const {
-    if (nodeIdx >= nodes.size()) return;
+    if (nodeIdx == -1) return;
 
     const Node& node = nodes[nodeIdx];
 
@@ -245,7 +245,7 @@ class KdTree {
   requires Point<PointU>
   void sphericalRangeSearchNode(int nodeIdx, const PointU& queryPoint, float r,
                                 std::vector<int>& list) const {
-    if (nodeIdx >= nodes.size()) return;
+    if (nodeIdx == -1) return;
 
     const Node& node = nodes[nodeIdx];
 
